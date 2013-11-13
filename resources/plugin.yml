@@ -1,0 +1,11 @@
+name: ${name}
+version: ${project.version}
+description: ${description}
+author: moose517
+main: com.moosemanstudios.Birthdays.Bukkit.Birthdays
+commands:
+    birthdays:
+        description: General command
+permissions:
+    birthdays.admin:
+        description: General Admin permission node
