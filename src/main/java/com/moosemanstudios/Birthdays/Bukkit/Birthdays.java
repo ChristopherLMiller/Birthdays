@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.Metrics;
 
 public class Birthdays extends JavaPlugin {
-	private Logger log = Logger.getLogger("minecraft");
+	public Logger log = Logger.getLogger("minecraft");
 	private String prefix = "[Birthdays] ";
 	private Boolean debug;
 	public Boolean updaterEnabled, updaterAuto, updaterNotify;
@@ -36,6 +36,9 @@ public class Birthdays extends JavaPlugin {
 			
 		}
 		
+		// register the command listener
+		getCommand("birthday").setExecutor(new BirthdaysCommandExecutor(this));
+		
 		// lastly register the metrics listener
 		try {
 			Metrics metrics = new MetricsBukkit(this.getName(), this.getDescription().getVersion());
@@ -43,11 +46,6 @@ public class Birthdays extends JavaPlugin {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	@Override
-	public void onDisable() {
-		
 	}
 	
 	private void loadConfig() {
@@ -58,6 +56,8 @@ public class Birthdays extends JavaPlugin {
 		if (!getConfig().contains("updater.enabled")) getConfig().set("updater.enabled", true);
 		if (!getConfig().contains("updater.auto")) getConfig().set("updater.auto", true);
 		if (!getConfig().contains("updater.notify")) getConfig().set("updater.notify", true);
+		
+		saveConfig();
 		
 		debug = getConfig().getBoolean("debug");
 		if (debug) {

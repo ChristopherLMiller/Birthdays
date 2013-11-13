@@ -4,7 +4,7 @@ description: ${description}
 author: moose517
 main: com.moosemanstudios.Birthdays.Bukkit.Birthdays
 commands:
-    birthdays:
+    birthday:
         description: General command
 permissions:
     birthdays.admin:
