@@ -28,8 +28,8 @@
 			<url>http://repo.mcstats.org/content/repositories/public</url>
 		</repository>
 		<repository>
-			<id>Spout-repo</id>
-			<url>http://nexus.spout.org/content/groups/public</url>
+			<id>Vault</id>
+			<url>http://ci.herocraftonline.com/plugin/repository/everything</url>
 		</repository>
 	</repositories>
 
@@ -48,15 +48,9 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.spout</groupId>
-			<artifactId>spoutapi</artifactId>
-			<version>dev-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.spout</groupId>
-			<artifactId>vanilla</artifactId>
-			<version>1.6.2-SNAPSHOT</version>
+			<groupId>net.milkbowl</groupId>
+			<artifactId>vault</artifactId>
+			<version>1.2.27</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

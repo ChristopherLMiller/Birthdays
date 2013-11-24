@@ -1,5 +1,9 @@
 package com.moosemanstudios.Birthdays.Bukkit;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import net.gravitydevelopment.updater.Updater;
 
 import org.bukkit.ChatColor;
@@ -39,11 +43,39 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 					setBirthday(split);
 				} else if (split[0].equalsIgnoreCase("view")) {
 					viewBirthday(split);
+				} else if (split[0].equalsIgnoreCase("claim")) {
+					claimPrize();
+				} else {
+					sender.sendMessage("Uknown command");
 				}
 			}
 			return true;
 		}
 		return false;
+	}
+	
+	public void claimPrize() {
+		if (sender instanceof Player) {
+			if (plugin.getConfig().contains("players." + sender.getName())) {
+				String dob = plugin.getConfig().getString("players." + sender.getName() + ".birthdate");
+				
+				if (dob.equalsIgnoreCase(getCurrentDate())) {
+					plugin.giveGifts(sender.getName());
+				} else {
+					sender.sendMessage("It's not your birthday, nice try!");
+				}
+			} else {
+				sender.sendMessage("You haven't set your birthday yet!");
+			}			
+		} else {
+			sender.sendMessage(ChatColor.RED + "Must be a player to issue this command");
+		}
+	}
+	
+	public String getCurrentDate() {
+		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		Date date = new Date();
+		return dateFormat.format(date);
 	}
 	
 	public void viewBirthday(String[] split) {
