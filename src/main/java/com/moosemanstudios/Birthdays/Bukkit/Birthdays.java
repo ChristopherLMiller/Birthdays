@@ -6,8 +6,11 @@ import java.util.logging.Logger;
 
 import net.gravitydevelopment.updater.Updater;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.Material;
+
 import org.mcstats.Metrics;
 
 public class Birthdays extends JavaPlugin {
@@ -17,6 +20,10 @@ public class Birthdays extends JavaPlugin {
 	private Boolean debug;
     public Boolean updaterEnabled, updaterAuto, updaterNotify;
     public static final int curseID = 0;
+
+    public Boolean itemGiftEnabled, currencyGiftEnabled;
+    public int itemGiftAmount, currencyGiftAmount;
+    public Material itemGiftType;
 
 	@Override
 	public void onEnable() {
@@ -46,6 +53,18 @@ public class Birthdays extends JavaPlugin {
         // register the command executor
         getCommand("birthday").setExecutor(new BirthdaysCommandExecutor(this));
 
+        // check for vault if currency is requested
+        if (Bukkit.getPluginManager().getPlugin("Vault") == null && currencyGiftEnabled) {
+            log.warning(prefix + "Vault not found and required for currency, disabling currency");
+            currencyGiftEnabled = false;
+        }
+
+        // check that we still have one method enabled, if not lets disable the plugin
+        if (!itemGiftEnabled && !currencyGiftEnabled) {
+            log.warning(prefix + "At least one gift type must be enabled, disabling plugin");
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
+
         // all done
         log.info(prefix + "Plugin enabled successfully");
     }
@@ -62,6 +81,13 @@ public class Birthdays extends JavaPlugin {
         if (!getConfig().contains("updater.auto")) getConfig().set("updater.auto", true);
         if (!getConfig().contains("updater.notify")) getConfig().set("updater.notify", true);
 
+        // gifts
+        if (!getConfig().contains("gifts.item.enabled")) getConfig().set("gifts.item.enabled", true);
+        if (!getConfig().contains("gifts.item.type")) getConfig().set("gifts.item.type", "diamond");
+        if (!getConfig().contains("gifts.item.amount")) getConfig().set("gifts.item.amount", 1);
+        if (!getConfig().contains("gifts.currency.enabled")) getConfig().set("gifts.currency.enabled", true);
+        if (!getConfig().contains("gifts.currency.amount")) getConfig().set("gifts.currency.amount", 50);
+
         // save the config before reading back
         saveConfig();
 
@@ -77,6 +103,19 @@ public class Birthdays extends JavaPlugin {
                 log.info(prefix + "Auto updating enabled");
             if (updaterNotify)
                 log.info(prefix + "Notifying admins on login of updates");
+        }
+
+        itemGiftEnabled = getConfig().getBoolean("gifts.item.enabled");
+        itemGiftType = Material.getMaterial(getConfig().getString("gifts.item.type"));
+        itemGiftAmount = getConfig().getInt("gifts.item.amount");
+        currencyGiftEnabled = getConfig().getBoolean("gifts.currency.enabled");
+        currencyGiftAmount = getConfig().getInt("gifts.currency.amount");
+
+        if (debug && itemGiftEnabled) {
+            log.info(prefix + "Giving out " +itemGiftAmount + " of " + itemGiftType.toString());
+        }
+        if (debug && currencyGiftEnabled) {
+            log.info(prefix + "Giving " + currencyGiftAmount + " money out for gifts");
         }
     }
 
