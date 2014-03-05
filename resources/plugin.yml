@@ -2,10 +2,18 @@ name: ${name}
 version: ${project.version}
 description: ${description}
 author: moose517
+website: ${url}
+
 main: com.moosemanstudios.Birthdays.Bukkit.Birthdays
+
 commands:
     birthday:
         description: General command
+        aliases: bday
 permissions:
+    birthdays.update:
+        description: Allows for updating of plugin
     birthdays.admin:
-        description: General Admin permission node
+        description: All general admin permissions
+        children:
+            birthdays.update: true

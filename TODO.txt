@@ -1,0 +1,6 @@
+# player listener for login
+## give if its there birthday
+
+# claim command - give player the present!
+
+# double check brithdate determination. seems to be going by year as well yikes

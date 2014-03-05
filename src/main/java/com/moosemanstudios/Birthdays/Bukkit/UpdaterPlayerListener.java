@@ -17,10 +17,11 @@ public class UpdaterPlayerListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
+        // Note - this listener is never registered if the updater is disabled
 		Player player = event.getPlayer();
 		
 		if (player.hasPermission("birthdays.admin")) {
-			Updater updater = new Updater(plugin, plugin.curseID, plugin.getFileFolder(), Updater.UpdateType.NO_DOWNLOAD, false);
+			Updater updater = new Updater(plugin, 0/*TODO: get actual ID*/, plugin.getFileFolder(), Updater.UpdateType.NO_DOWNLOAD, false);
 			
 			if (updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE && plugin.updaterNotify && plugin.updaterEnabled) {
 				player.sendMessage(ChatColor.AQUA + "An update is available for Birthdays: " + updater.getLatestName());
