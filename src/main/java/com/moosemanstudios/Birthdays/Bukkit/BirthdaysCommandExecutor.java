@@ -1,11 +1,12 @@
 package com.moosemanstudios.Birthdays.Bukkit;
 
+import com.moosemanstudios.Birthdays.Core.BirthdayManager;
 import net.gravitydevelopment.updater.Updater;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class BirthdaysCommandExecutor implements CommandExecutor {
 
@@ -30,6 +31,8 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
                     update(sender);
 				else if (args[0].equalsIgnoreCase("reload"))
 					reload(sender, args);
+				else if (args[0].equalsIgnoreCase("set"))
+					setBirthday(sender, args);
                 else
                     sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help" + ChatColor.WHITE + " for all available commands");
             }
@@ -94,7 +97,7 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 				sender.sendMessage(ChatColor.RED + "Missing required permission node: " + ChatColor.WHITE + "birthdays.reload.all");
 			}
 		} else if (args.length == 2) {
-			if (args[0].equalsIgnoreCase("config")) {
+			if (args[1].equalsIgnoreCase("config")) {
 				if (sender.hasPermission("birthdays.reload.config")) {
 					plugin.loadConfig();
 					sender.sendMessage("Config file reloaded");
@@ -103,10 +106,47 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 				}
 			} else {
 				// TODO: add other config reloads here
-				sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help " + ChatColor.RESET +  "for complete list of commands");
+				sender.sendMessage("Invalid sub-command.  Please see " + ChatColor.RED + "/birthdays help " + ChatColor.RESET +  "for complete list of commands");
 			}
 		} else {
 			sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help " + ChatColor.RESET +  "for complete list of commands");
+		}
+	}
+
+	public void setBirthday(CommandSender sender, String args[]) {
+		// only available to players
+		if (!(sender instanceof Player)) {
+			sender.sendMessage(ChatColor.RED + "Only players can set there birthday");
+			return;
+		}
+		// see if the player has already set there birthday, don't want them to be able to redefine it
+		if (BirthdayManager.getInstance().getConfig().contains(sender.getName() + ".birthday")) {
+			sender.sendMessage(ChatColor.RED + "Birthday has already been set.  You must get an admin to change if its wrong");
+			return;
+		} else {
+			if (args.length != 2) {
+				sender.sendMessage(ChatColor.RED + "Must provide your birthday in the format of MM/DD and nothing more");
+				return;
+			} else {
+				// parse out and verify the data
+				if (args[1].contains("/")) {
+					int month = Integer.parseInt(args[1].substring(0, args[1].indexOf("/")));
+					int day = Integer.parseInt(args[1].substring(args[1].indexOf("/") + 1));
+
+					if ((month < 1 || month > 12) || (day < 1 || day > 31)) {
+						sender.sendMessage(ChatColor.RED + "The date you entered is invalid");
+						return;
+					} else {
+						BirthdayManager.getInstance().getConfig().set(sender.getName() + ".birthday", args[1]);
+						BirthdayManager.getInstance().saveConfig();
+						sender.sendMessage(ChatColor.AQUA + "Birthday successfully set");
+						return;
+					}
+				} else {
+					sender.sendMessage(ChatColor.RED + "Birthday entered incorrectly.  Must be in format of MM/DD");
+				}
+
+			}
 		}
 	}
 }

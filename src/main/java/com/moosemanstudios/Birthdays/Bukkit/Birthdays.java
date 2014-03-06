@@ -1,20 +1,19 @@
 package com.moosemanstudios.Birthdays.Bukkit;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Logger;
-
+import com.moosemanstudios.Birthdays.Core.BirthdayManager;
 import net.gravitydevelopment.updater.Updater;
-
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.Material;
-
 import org.mcstats.Metrics;
 
-import net.milkbowl.vault.economy.Economy;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 public class Birthdays extends JavaPlugin {
 	public Logger log = Logger.getLogger("minecraft");
@@ -29,6 +28,8 @@ public class Birthdays extends JavaPlugin {
     public Material itemGiftType;
 
 	public static Economy economy = null;
+
+	public int maxNotify;
 
 	@Override
 	public void onEnable() {
@@ -60,8 +61,13 @@ public class Birthdays extends JavaPlugin {
 
         // check for vault if currency is requested
         if (currencyGiftEnabled) {
-			if (!setupEconomy()) {
-				log.warning(prefix + "Vault and/or a economy plugin were not found.  Turning off currency gifts.");
+			if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
+				if (!setupEconomy()) {
+					log.warning(prefix + "No economy plugin was found.  Turning off currency gifts.");
+					currencyGiftEnabled = false;
+				}
+			} else {
+				log.warning(prefix + "Vault was not found and is required for currency gifts. Disabling currency");
 				currencyGiftEnabled = false;
 			}
 		}
@@ -71,6 +77,18 @@ public class Birthdays extends JavaPlugin {
             log.warning(prefix + "At least one gift type must be enabled, disabling plugin");
             Bukkit.getPluginManager().disablePlugin(this);
         }
+
+		// Initialize the birthday manager
+		try {
+			BirthdayManager.getInstance().load(getDataFolder() + File.separator + "players.yml");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+		}
+
+		// register the event listener
+		Bukkit.getPluginManager().registerEvents(new JoinPlayerListener(this), this);
 
         // all done
         log.info(prefix + "Plugin enabled successfully");
@@ -90,6 +108,7 @@ public class Birthdays extends JavaPlugin {
 
         // misc settings
         if (!getConfig().contains("misc.debug")) getConfig().set("misc.debug", true);
+		if (!getConfig().contains("misc.max-notifications")) getConfig().set("misc.max-notifications", 3);
 
         // updater settings
         if (!getConfig().contains("updater.enabled")) getConfig().set("updater.enabled", true);
@@ -109,6 +128,10 @@ public class Birthdays extends JavaPlugin {
         debug = getConfig().getBoolean("misc.debug");
         if (debug)
             log.info(prefix + "Debugging enabled");
+
+		maxNotify = getConfig().getInt("misc.max-notifications");
+		if (debug)
+			log.info(prefix + "Max notifications on join: " + maxNotify);
 
         updaterEnabled = getConfig().getBoolean("updater.enabled");
         updaterAuto = getConfig().getBoolean("updater.auto");
