@@ -85,7 +85,7 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
     }
 
 	public void reload(CommandSender sender, String args[]) {
-		if (args.length == 0) {
+		if (args.length == 1) {
 			if (sender.hasPermission("birthdays.reload.all")) {
 				// TODO: reload all configs
 				plugin.loadConfig();
@@ -93,7 +93,7 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 			} else {
 				sender.sendMessage(ChatColor.RED + "Missing required permission node: " + ChatColor.WHITE + "birthdays.reload.all");
 			}
-		} else if (args.length == 1) {
+		} else if (args.length == 2) {
 			if (args[0].equalsIgnoreCase("config")) {
 				if (sender.hasPermission("birthdays.reload.config")) {
 					plugin.loadConfig();
@@ -103,10 +103,10 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 				}
 			} else {
 				// TODO: add other config reloads here
-				sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help" + ChatColor.WHITE +  "for complete list of commands");
+				sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help " + ChatColor.RESET +  "for complete list of commands");
 			}
 		} else {
-			sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help" + ChatColor.WHITE +  "for complete list of commands");
+			sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help " + ChatColor.RESET +  "for complete list of commands");
 		}
 	}
 }
