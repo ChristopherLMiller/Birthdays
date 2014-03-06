@@ -121,13 +121,13 @@ public class Birthdays extends JavaPlugin {
         }
 
         itemGiftEnabled = getConfig().getBoolean("gifts.item.enabled");
-        itemGiftType = Material.getMaterial(getConfig().getString("gifts.item.type"));
+        itemGiftType = Material.getMaterial("dirt"); //getConfig().getString("gifts.item.type"));
         itemGiftAmount = getConfig().getInt("gifts.item.amount");
         currencyGiftEnabled = getConfig().getBoolean("gifts.currency.enabled");
         currencyGiftAmount = getConfig().getInt("gifts.currency.amount");
 
         if (debug && itemGiftEnabled) {
-            log.info(prefix + "Giving out " + /*Integer.toString(itemGiftAmount) + " of " +*/ itemGiftType);
+            log.info(prefix + "Giving out " + Integer.toString(itemGiftAmount) + " of " + itemGiftType);
         }
         if (debug && currencyGiftEnabled) {
             log.info(prefix + "Giving " + Integer.toString(currencyGiftAmount) + " money out for gifts");
