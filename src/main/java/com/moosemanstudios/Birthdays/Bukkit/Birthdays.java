@@ -8,10 +8,13 @@ import net.gravitydevelopment.updater.Updater;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Material;
 
 import org.mcstats.Metrics;
+
+import net.milkbowl.vault.economy.Economy;
 
 public class Birthdays extends JavaPlugin {
 	public Logger log = Logger.getLogger("minecraft");
@@ -24,6 +27,8 @@ public class Birthdays extends JavaPlugin {
     public Boolean itemGiftEnabled, currencyGiftEnabled;
     public int itemGiftAmount, currencyGiftAmount;
     public Material itemGiftType;
+
+	public static Economy economy = null;
 
 	@Override
 	public void onEnable() {
@@ -51,13 +56,15 @@ public class Birthdays extends JavaPlugin {
         }
 
         // register the command executor
-        getCommand("birthday").setExecutor(new BirthdaysCommandExecutor(this));
+        getCommand("birthdays").setExecutor(new BirthdaysCommandExecutor(this));
 
         // check for vault if currency is requested
-        if (Bukkit.getPluginManager().getPlugin("Vault") == null && currencyGiftEnabled) {
-            log.warning(prefix + "Vault not found and required for currency, disabling currency");
-            currencyGiftEnabled = false;
-        }
+        if (currencyGiftEnabled) {
+			if (!setupEconomy()) {
+				log.warning(prefix + "Vault and/or a economy plugin were not found.  Turning off currency gifts.");
+				currencyGiftEnabled = false;
+			}
+		}
 
         // check that we still have one method enabled, if not lets disable the plugin
         if (!itemGiftEnabled && !currencyGiftEnabled) {
@@ -69,6 +76,14 @@ public class Birthdays extends JavaPlugin {
         log.info(prefix + "Plugin enabled successfully");
     }
 
+	public Boolean setupEconomy() {
+		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
+		if (economyProvider != null) {
+			economy = economyProvider.getProvider();
+		}
+
+		return (economy != null);
+	}
     public void loadConfig() {
         // start by reloading the config
         reloadConfig();
@@ -112,7 +127,7 @@ public class Birthdays extends JavaPlugin {
         currencyGiftAmount = getConfig().getInt("gifts.currency.amount");
 
         if (debug && itemGiftEnabled) {
-            log.info(prefix + "Giving out " +itemGiftAmount + " of " + itemGiftType.toString());
+            log.info(prefix + "Giving out " + itemGiftAmount + " of " + itemGiftType.toString());
         }
         if (debug && currencyGiftEnabled) {
             log.info(prefix + "Giving " + currencyGiftAmount + " money out for gifts");

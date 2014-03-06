@@ -7,9 +7,9 @@ website: ${url}
 main: com.moosemanstudios.Birthdays.Bukkit.Birthdays
 
 commands:
-    birthday:
+    birthdays:
         description: General command
-        aliases: bday
+        aliases: bdays
 permissions:
     birthdays.update:
         description: Allows for updating of plugin
