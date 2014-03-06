@@ -13,7 +13,14 @@ commands:
 permissions:
     birthdays.update:
         description: Allows for updating of plugin
+    birthdays.reload.config:
+        description: Allow reloading of config file
+    birthdays.reload.all:
+        description: Access to all reload commands
+        children:
+            birthdays.reload.config: true
     birthdays.admin:
         description: All general admin permissions
         children:
             birthdays.update: true
+            birthdays.reload.*: true

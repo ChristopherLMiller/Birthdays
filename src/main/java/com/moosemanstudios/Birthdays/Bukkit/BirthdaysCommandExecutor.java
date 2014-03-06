@@ -28,6 +28,8 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
                     showVersion(sender);
                 else if (args[0].equalsIgnoreCase("update"))
                     update(sender);
+				else if (args[0].equalsIgnoreCase("reload"));
+					reload(sender, args);
                 else
                     sender.sendMessage(ChatColor.WHITE + "Invalid command.  Please see " + ChatColor.RED + "/birthdays help" + ChatColor.WHITE + " for all available commands");
             }
@@ -45,6 +47,9 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
         if (sender.hasPermission("birthdays.update")) {
             sender.sendMessage("/birthdays update" + ChatColor.RED + ": Check for and apply update");
         }
+		if (sender.hasPermission("birthdays.reload.config")) {
+			sender.sendMessage("/birthdays reload config" + ChatColor.RED + ": Reload the config from disk");
+		}
     }
 
     public void showVersion(CommandSender sender) {
@@ -75,4 +80,30 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "Missing required permission node: " + ChatColor.WHITE + "birthdays.update");
         }
     }
+
+	public void reload(CommandSender sender, String args[]) {
+		if (args.length == 0) {
+			if (sender.hasPermission("birthdays.reload.all")) {
+				// TODO: reload all configs
+				plugin.loadConfig();
+				sender.sendMessage("All files reloaded");
+			} else {
+				sender.sendMessage(ChatColor.RED + "Missing required permission node: " + ChatColor.WHITE + "birthdays.reload.all");
+			}
+		} else if (args.length == 1) {
+			if (args[0].equalsIgnoreCase("config")) {
+				if (sender.hasPermission("birthdays.reload.config")) {
+					plugin.loadConfig();
+					sender.sendMessage("Config file reloaded");
+				} else {
+					sender.sendMessage(ChatColor.RED+  "Missing required permission node: " + ChatColor.WHITE + "birthdays.reload.config");
+				}
+			} else {
+				// TODO: add other config reloads here
+				sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help" + ChatColor.WHITE +  "for complete list of commands");
+			}
+		} else {
+			sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help" + ChatColor.WHITE +  "for complete list of commands");
+		}
+	}
 }
