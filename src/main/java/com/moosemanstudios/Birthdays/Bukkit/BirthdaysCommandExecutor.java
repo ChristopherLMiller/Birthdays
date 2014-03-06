@@ -28,7 +28,7 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
                     showVersion(sender);
                 else if (args[0].equalsIgnoreCase("update"))
                     update(sender);
-				else if (args[0].equalsIgnoreCase("reload"));
+				else if (args[0].equalsIgnoreCase("reload"))
 					reload(sender, args);
                 else
                     sender.sendMessage(ChatColor.WHITE + "Invalid command.  Please see " + ChatColor.RED + "/birthdays help" + ChatColor.WHITE + " for all available commands");
@@ -47,6 +47,9 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
         if (sender.hasPermission("birthdays.update")) {
             sender.sendMessage("/birthdays update" + ChatColor.RED + ": Check for and apply update");
         }
+		if (sender.hasPermission("birthdays.reload.all")) {
+			sender.sendMessage("/birthdays reload" + ChatColor.RED + ": Reload all configuration files");
+		}
 		if (sender.hasPermission("birthdays.reload.config")) {
 			sender.sendMessage("/birthdays reload config" + ChatColor.RED + ": Reload the config from disk");
 		}
