@@ -121,7 +121,7 @@ public class Birthdays extends JavaPlugin {
         }
 
         itemGiftEnabled = getConfig().getBoolean("gifts.item.enabled");
-        itemGiftType = Material.getMaterial("dirt"); //getConfig().getString("gifts.item.type"));
+        itemGiftType = Material.matchMaterial(getConfig().getString("gifts.item.type"));
         itemGiftAmount = getConfig().getInt("gifts.item.amount");
         currencyGiftEnabled = getConfig().getBoolean("gifts.currency.enabled");
         currencyGiftAmount = getConfig().getInt("gifts.currency.amount");
