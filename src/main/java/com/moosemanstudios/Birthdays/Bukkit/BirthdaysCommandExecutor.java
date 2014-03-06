@@ -18,7 +18,7 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("birthday") || cmd.getName().equalsIgnoreCase("bdays")) {
+        if (cmd.getName().equalsIgnoreCase("birthdays") || cmd.getName().equalsIgnoreCase("bdays")) {
             if (args.length == 0) {
                 displayHelp(sender);
             } else {
@@ -31,7 +31,7 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 				else if (args[0].equalsIgnoreCase("reload"))
 					reload(sender, args);
                 else
-                    sender.sendMessage(ChatColor.WHITE + "Invalid command.  Please see " + ChatColor.RED + "/birthdays help" + ChatColor.WHITE + " for all available commands");
+                    sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help" + ChatColor.WHITE + " for all available commands");
             }
             return true;
         }
