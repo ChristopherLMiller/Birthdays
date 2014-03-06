@@ -127,10 +127,10 @@ public class Birthdays extends JavaPlugin {
         currencyGiftAmount = getConfig().getInt("gifts.currency.amount");
 
         if (debug && itemGiftEnabled) {
-            log.info(prefix + "Giving out " + itemGiftAmount + " of " + itemGiftType.toString());
+            log.info(prefix + "Giving out " + Integer.toString(itemGiftAmount) + " of " + itemGiftType.toString());
         }
         if (debug && currencyGiftEnabled) {
-            log.info(prefix + "Giving " + currencyGiftAmount + " money out for gifts");
+            log.info(prefix + "Giving " + Integer.toString(currencyGiftAmount) + " money out for gifts");
         }
     }
 
