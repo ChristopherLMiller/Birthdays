@@ -4,7 +4,7 @@
   <groupId>com.moosemanstudios</groupId>
   <artifactId>birthdays</artifactId>
   <name>Birthdays</name>
-  <version>1.0</version>
+  <version>1.0-SNAPSHOT</version>
   <description>Give Players presents on their birthday!</description>
   <url>http://www.moosemanstudios.com</url>
   <build>

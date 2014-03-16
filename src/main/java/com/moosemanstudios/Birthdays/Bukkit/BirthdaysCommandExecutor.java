@@ -2,11 +2,19 @@ package com.moosemanstudios.Birthdays.Bukkit;
 
 import com.moosemanstudios.Birthdays.Core.BirthdayManager;
 import net.gravitydevelopment.updater.Updater;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 
 public class BirthdaysCommandExecutor implements CommandExecutor {
 
@@ -33,8 +41,12 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 					reload(sender, args);
 				else if (args[0].equalsIgnoreCase("set"))
 					setBirthday(sender, args);
+				else if (args[0].equalsIgnoreCase("change"))
+					changeBirthday(sender, args);
+				else if (args[0].equalsIgnoreCase("claim"))
+					claimPresent(sender, args);
                 else
-                    sender.sendMessage("Invalid command.  Please see " + ChatColor.RED + "/birthdays help" + ChatColor.WHITE + " for all available commands");
+                    sender.sendMessage(ChatColor.RED + "Invalid command.  Please see " + ChatColor.WHITE + "/birthdays help" + ChatColor.RED + " for all available commands");
             }
             return true;
         }
@@ -47,6 +59,9 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
         sender.sendMessage("/birthdays help" + ChatColor.RED + ": Display this screen");
         sender.sendMessage("/birthdays version" + ChatColor.RED + ": Show plugin version");
 
+		if (sender.hasPermission("birthdays.set")) {
+			sender.sendMessage("/birthdays change <player> <MM/DD>" + ChatColor.RED + ": Set players birthday to that specified");
+		}
         if (sender.hasPermission("birthdays.update")) {
             sender.sendMessage("/birthdays update" + ChatColor.RED + ": Check for and apply update");
         }
@@ -55,6 +70,9 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 		}
 		if (sender.hasPermission("birthdays.reload.config")) {
 			sender.sendMessage("/birthdays reload config" + ChatColor.RED + ": Reload the config from disk");
+		}
+		if (sender.hasPermission("birthdays.reload.players")) {
+			sender.sendMessage("/birthdays reload players" + ChatColor.RED + ": Reload the players file from disk");
 		}
     }
 
@@ -87,6 +105,61 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
         }
     }
 
+	public void claimPresent(CommandSender sender, String args[]) {
+		if (sender instanceof Player) {
+			Player player = (Player) sender;
+
+			// make sure they aren't in creative first of all
+			if (player.getGameMode() != GameMode.CREATIVE) {
+
+				// verify its actually the persons birthday and they haven't claimed already
+				String birthday = BirthdayManager.getInstance().getConfig().getString(sender.getName() + ".birthday");
+				int claimedYear = BirthdayManager.getInstance().getConfig().getInt(sender.getName() + ".claimed");
+
+				// get and format the current date to match what we store
+				String date = new SimpleDateFormat("MM/dd").format(Calendar.getInstance().getTime());
+				int year = Integer.parseInt(new SimpleDateFormat("yyyy").format(Calendar.getInstance().getTime()));
+
+				if ((birthday.equals(date)) && (claimedYear < year)) {
+
+					// give the players there items
+					if (plugin.itemGiftEnabled) {
+						ItemStack item = new ItemStack(plugin.itemGiftType, plugin.itemGiftAmount);
+						Inventory inv = player.getInventory();
+
+						HashMap<Integer, ItemStack> leftOver = inv.addItem(item);
+
+						if (leftOver.isEmpty()) {
+							player.sendMessage(ChatColor.AQUA + "Your gift has been given");
+						} else {
+							player.getWorld().dropItem(player.getLocation(), new ItemStack(plugin.itemGiftType, leftOver.get(0).getAmount()));
+							player.sendMessage(ChatColor.AQUA + "Your inventory was too full for the gift, it has been dropped on the ground. Ooops.");
+						}
+					}
+
+					if (plugin.currencyGiftEnabled) {
+						EconomyResponse response = plugin.economy.depositPlayer(player.getName(), plugin.currencyGiftAmount);
+						if (response.transactionSuccess()) {
+							player.sendMessage(ChatColor.AQUA + "Money have been gifted to your account!");
+						} else {
+							player.sendMessage(ChatColor.AQUA + "Something has gone wrong tying to give you money for your birthday :(");
+						}
+					}
+
+					// finally lets update the file so that they can't claim again
+					BirthdayManager.getInstance().getConfig().set(player.getName() + ".claimed", year);
+					BirthdayManager.getInstance().saveConfig();
+				} else {
+					player.sendMessage(ChatColor.RED + "You have already claimed your gifts for this year!");
+				}
+			} else {
+				sender.sendMessage(ChatColor.AQUA + "Gifts won't be given in creative mode.  Just to ensure you receive them :)");
+			}
+		} else {
+			sender.sendMessage(ChatColor.RED + "Command only available to players");
+		}
+	}
+
 	public void reload(CommandSender sender, String args[]) {
 		if (args.length == 1) {
 			if (sender.hasPermission("birthdays.reload.all")) {
@@ -103,6 +176,13 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 					sender.sendMessage("Config file reloaded");
 				} else {
 					sender.sendMessage(ChatColor.RED+  "Missing required permission node: " + ChatColor.WHITE + "birthdays.reload.config");
+				}
+			} else if (args[1].equalsIgnoreCase("player")) {
+				if (sender.hasPermission("birthdays.reload.players")) {
+					BirthdayManager.getInstance().reloadConfig();
+					sender.sendMessage("Players file reloaded");
+				} else {
+					sender.sendMessage(ChatColor.RED + "Missing required permission node: " + ChatColor.WHITE + "birthdays.reload.players");
 				}
 			} else {
 				// TODO: add other config reloads here
@@ -147,6 +227,35 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 				}
 
 			}
+		}
+	}
+
+	public void changeBirthday(CommandSender sender, String args[]) {
+		if (sender.hasPermission("birthdays.set")) {
+			if (args.length == 3) {
+				String player = args[1];
+
+				if (args[2].contains("/")) {
+					int month = Integer.parseInt(args[2].substring(0, args[2].indexOf("/")));
+					int day = Integer.parseInt(args[2].substring(args[2].indexOf("/") + 1));
+
+					if ((month < 1 || month > 12) || (day < 1 || day > 31)) {
+						sender.sendMessage(ChatColor.RED + "The date you entered is invalid");
+						return;
+					} else {
+						BirthdayManager.getInstance().getConfig().set(player + ".birthday", args[2]);
+						BirthdayManager.getInstance().saveConfig();
+						sender.sendMessage(ChatColor.AQUA + "Birthday successfully set");
+						return;
+					}
+				} else {
+					sender.sendMessage(ChatColor.RED + "Birthday entered incorrectly.  Must be in format of MM/DD");
+				}
+			} else {
+				sender.sendMessage(ChatColor.RED + "Invalid syntax, see help for proper usage");
+			}
+		} else {
+			sender.sendMessage(ChatColor.RED + "Missing required permission node: " + ChatColor.WHITE + "birthdays.set");
 		}
 	}
 }

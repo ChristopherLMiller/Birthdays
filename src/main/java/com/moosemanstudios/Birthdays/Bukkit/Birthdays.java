@@ -17,11 +17,13 @@ import java.util.logging.Logger;
 
 public class Birthdays extends JavaPlugin {
 	public Logger log = Logger.getLogger("minecraft");
-	private String prefix = "[Birthdays] ";
+	public String prefix = "[Birthdays] ";
     public PluginDescriptionFile pdfFile = this.getDescription();
 	private Boolean debug;
     public Boolean updaterEnabled, updaterAuto, updaterNotify;
     public static final int curseID = 0;
+
+	public Boolean broadcastOnJoin;
 
     public Boolean itemGiftEnabled, currencyGiftEnabled;
     public int itemGiftAmount, currencyGiftAmount;
@@ -109,6 +111,7 @@ public class Birthdays extends JavaPlugin {
         // misc settings
         if (!getConfig().contains("misc.debug")) getConfig().set("misc.debug", true);
 		if (!getConfig().contains("misc.max-notifications")) getConfig().set("misc.max-notifications", 3);
+		if (!getConfig().contains("misc.broadcast-on-join")) getConfig().set("misc.broadcast-on-join", true);
 
         // updater settings
         if (!getConfig().contains("updater.enabled")) getConfig().set("updater.enabled", true);
@@ -132,6 +135,8 @@ public class Birthdays extends JavaPlugin {
 		maxNotify = getConfig().getInt("misc.max-notifications");
 		if (debug)
 			log.info(prefix + "Max notifications on join: " + maxNotify);
+
+		broadcastOnJoin = getConfig().getBoolean("misc.broadcast-on-join");
 
         updaterEnabled = getConfig().getBoolean("updater.enabled");
         updaterAuto = getConfig().getBoolean("updater.auto");

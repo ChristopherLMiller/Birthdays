@@ -61,4 +61,14 @@ public class BirthdayManager {
 			e.printStackTrace();
 		}
 	}
+
+	public void reloadConfig() {
+		try {
+			config.load(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+		}
+	}
 }
