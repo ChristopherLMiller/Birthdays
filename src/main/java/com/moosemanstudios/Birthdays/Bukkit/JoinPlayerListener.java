@@ -38,7 +38,6 @@ public class JoinPlayerListener implements Listener {
 			String date = new SimpleDateFormat("MM/dd").format(Calendar.getInstance().getTime());
 			int year = Integer.parseInt(new SimpleDateFormat("yyyy").format(Calendar.getInstance().getTime()));
 
-			plugin.log.info(plugin.prefix + birthday + date + claimedYear + year);
 			if ((claimedYear < year) && (birthday.equals(date))) {
 				player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&9* &a* &b* &c* &d* &e* &f* &9* &a* &b* &c* &d* &e* &f* &9* &a* &b* &c* &d* &e* &f* &9* &a* &b* &c* &d* &e* &f*"));
 				player.sendMessage(ChatColor.AQUA + "HAPPY BIRTHDAY!");
