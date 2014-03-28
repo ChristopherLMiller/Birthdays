@@ -21,7 +21,7 @@ public class Birthdays extends JavaPlugin {
     public PluginDescriptionFile pdfFile = this.getDescription();
 	private Boolean debug;
     public Boolean updaterEnabled, updaterAuto, updaterNotify;
-    public static final int curseID = 0;
+    public static final int curseID = 68957;
 
 	public Boolean broadcastOnJoin;
 
