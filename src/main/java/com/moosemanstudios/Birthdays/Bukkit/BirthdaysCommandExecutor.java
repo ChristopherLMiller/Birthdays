@@ -1,7 +1,6 @@
 package com.moosemanstudios.Birthdays.Bukkit;
 
 import com.moosemanstudios.Birthdays.Core.BirthdayManager;
-import net.gravitydevelopment.updater.Updater;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -35,8 +34,6 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
                     displayHelp(sender);
                 else if (args[0].equalsIgnoreCase("version"))
                     showVersion(sender);
-                else if (args[0].equalsIgnoreCase("update"))
-                    update(sender);
 				else if (args[0].equalsIgnoreCase("reload"))
 					reload(sender, args);
 				else if (args[0].equalsIgnoreCase("set"))
@@ -62,9 +59,6 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 		if (sender.hasPermission("birthdays.set")) {
 			sender.sendMessage("/birthdays change <player> <MM/DD>" + ChatColor.RED + ": Set players birthday to that specified");
 		}
-        if (sender.hasPermission("birthdays.update")) {
-            sender.sendMessage("/birthdays update" + ChatColor.RED + ": Check for and apply update");
-        }
 		if (sender.hasPermission("birthdays.reload.all")) {
 			sender.sendMessage("/birthdays reload" + ChatColor.RED + ": Reload all configuration files");
 		}
@@ -78,31 +72,6 @@ public class BirthdaysCommandExecutor implements CommandExecutor {
 
     public void showVersion(CommandSender sender) {
         sender.sendMessage(ChatColor.GOLD + "Birthdays Version:" + ChatColor.WHITE + plugin.pdfFile.getVersion() + ChatColor.GOLD + " Author: moose517");
-    }
-
-    public void update(CommandSender sender) {
-        if (sender.hasPermission("birthdays.update")) {
-            if (plugin.updaterEnabled) {
-                Updater updater = new Updater(plugin, plugin.curseID, plugin.getFileFolder(), Updater.UpdateType.NO_DOWNLOAD, false);
-                if (updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) {
-                    sender.sendMessage(ChatColor.AQUA + "Update found, starting download: " + updater.getLatestName());
-                    updater = new Updater(plugin, plugin.curseID, plugin.getFileFolder(), Updater.UpdateType.DEFAULT, true);
-
-                    if (updater.getResult() == Updater.UpdateResult.SUCCESS) {
-                        sender.sendMessage(ChatColor.AQUA + "Update downloaded successfully, restart server to apply update");
-                    } else {
-                        sender.sendMessage(ChatColor.AQUA + "Update download failed.  Please try again later or contact moose517");
-                    }
-                } else  if (updater.getResult() == Updater.UpdateResult.NO_UPDATE) {
-                    sender.sendMessage(ChatColor.AQUA + "No update found");
-                } else {
-                    sender.sendMessage(ChatColor.AQUA + "Something has gone wrong. Contact moose517 on bukkit.org");
-                }
-
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + "Missing required permission node: " + ChatColor.WHITE + "birthdays.update");
-        }
     }
 
 	public void claimPresent(CommandSender sender, String args[]) {

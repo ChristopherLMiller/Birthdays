@@ -1,0 +1,4 @@
+com\moosemanstudios\Birthdays\Bukkit\BirthdaysCommandExecutor.class
+com\moosemanstudios\Birthdays\Core\BirthdayManager.class
+com\moosemanstudios\Birthdays\Bukkit\Birthdays.class
+com\moosemanstudios\Birthdays\Bukkit\JoinPlayerListener.class

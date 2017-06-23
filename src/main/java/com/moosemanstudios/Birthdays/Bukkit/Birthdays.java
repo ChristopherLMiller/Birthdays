@@ -1,15 +1,14 @@
 package com.moosemanstudios.Birthdays.Bukkit;
 
 import com.moosemanstudios.Birthdays.Core.BirthdayManager;
-import net.gravitydevelopment.updater.Updater;
 import net.milkbowl.vault.economy.Economy;
+import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.mcstats.Metrics;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,24 +38,7 @@ public class Birthdays extends JavaPlugin {
         loadConfig();
 
         // enable metrics tracking
-        try {
-            Metrics metrics = new Metrics(this);
-            metrics.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // check updater settings - Note values obtained from config
-        if (updaterEnabled) {
-            if (updaterAuto) {
-                Updater updater = new Updater(this, curseID, this.getFile(), Updater.UpdateType.DEFAULT, true);
-                if (updater.getResult() == Updater.UpdateResult.SUCCESS)
-                    log.info(prefix + "Update downloaded successfully, restart server to apply update");
-            }
-            if (updaterNotify) {
-                this.getServer().getPluginManager().registerEvents(new UpdaterPlayerListener(this), this);
-            }
-        }
+        Metrics metrics = new Metrics(this);
 
         // register the command executor
         getCommand("birthdays").setExecutor(new BirthdaysCommandExecutor(this));
@@ -113,11 +95,6 @@ public class Birthdays extends JavaPlugin {
 		if (!getConfig().contains("misc.max-notifications")) getConfig().set("misc.max-notifications", 3);
 		if (!getConfig().contains("misc.broadcast-on-join")) getConfig().set("misc.broadcast-on-join", true);
 
-        // updater settings
-        if (!getConfig().contains("updater.enabled")) getConfig().set("updater.enabled", true);
-        if (!getConfig().contains("updater.auto")) getConfig().set("updater.auto", true);
-        if (!getConfig().contains("updater.notify")) getConfig().set("updater.notify", true);
-
         // gifts
         if (!getConfig().contains("gifts.item.enabled")) getConfig().set("gifts.item.enabled", true);
         if (!getConfig().contains("gifts.item.type")) getConfig().set("gifts.item.type", "diamond");
@@ -137,16 +114,6 @@ public class Birthdays extends JavaPlugin {
 			log.info(prefix + "Max notifications on join: " + maxNotify);
 
 		broadcastOnJoin = getConfig().getBoolean("misc.broadcast-on-join");
-
-        updaterEnabled = getConfig().getBoolean("updater.enabled");
-        updaterAuto = getConfig().getBoolean("updater.auto");
-        updaterNotify = getConfig().getBoolean("updater.notify");
-        if (debug && updaterEnabled) {
-            if (updaterAuto)
-                log.info(prefix + "Auto updating enabled");
-            if (updaterNotify)
-                log.info(prefix + "Notifying admins on login of updates");
-        }
 
         itemGiftEnabled = getConfig().getBoolean("gifts.item.enabled");
         itemGiftType = Material.matchMaterial(getConfig().getString("gifts.item.type"));

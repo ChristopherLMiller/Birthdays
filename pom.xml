@@ -57,7 +57,7 @@
 	<!-- Build configuration -->
 	<build>
 		<defaultGoal>clean package</defaultGoal>
-		<finalName>PingListMOTD</finalName>
+		<finalName>Birthdays</finalName>
 
 		<!-- Resources -->
 		<resources>
